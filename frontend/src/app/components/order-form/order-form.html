@@ -1,0 +1,77 @@
+<div class="glass panel">
+  <div class="panel__head">
+    <div class="panel__icon" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3v18M5 10l7-6 7 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div>
+      <h2 class="panel__title">New order</h2>
+      <p class="panel__subtitle">Add a product to the shop</p>
+    </div>
+  </div>
+
+  <form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="field">
+      <label for="productName">Product name</label>
+      <input
+        id="productName"
+        class="input"
+        type="text"
+        placeholder="e.g. Ergonomic Office Chair"
+        formControlName="productName" />
+      @if (titleRequired) {
+        <small class="hint hint--err">Give your product a name.</small>
+      } @else if (titleTooShort) {
+        <small class="hint hint--err">At least 2 characters.</small>
+      }
+    </div>
+
+    <div class="form__row">
+      <div class="field">
+        <label for="quantity">Quantity</label>
+        <input
+          id="quantity"
+          class="input"
+          type="number"
+          min="1"
+          step="1"
+          formControlName="quantity" />
+        @if (quantityInvalid) {
+          <small class="hint hint--err">Must be at least 1.</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="unitPrice">Unit price</label>
+        <div class="input-wrap">
+          <input
+            id="unitPrice"
+            class="input"
+            type="number"
+            min="0.01"
+            step="0.01"
+            placeholder="0.00"
+            formControlName="unitPrice" />
+          <span class="suffix">USD</span>
+        </div>
+        @if (priceInvalid) {
+          <small class="hint hint--err">Enter a price above 0.</small>
+        }
+      </div>
+    </div>
+
+    <div class="form__footer">
+      <div class="total">
+        <span class="total__label">Estimated total</span>
+        <span class="total__value">{{ estimatedTotal() | number: '1.2-2' }} USD</span>
+      </div>
+      <button class="btn btn-primary btn-lg" type="submit" [disabled]="form.invalid">
+        @if (form.invalid) {
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        } @else {
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        }
+        Place order
+      </button>
+    </div>
+  </form>
+</div>

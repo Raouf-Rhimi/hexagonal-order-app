@@ -1,11 +1,13 @@
 # Hexagonal Orders — Ports & Adapters in Practice
 
 A minimal, teaching-grade implementation of **Hexagonal Architecture** (a.k.a. Ports & Adapters)
-using **Java 17**, **Maven**, **Spring Boot 3**, and **MySQL**.
+with a full stack: **Java 17**, **Maven**, **Spring Boot 3**, **MySQL**, and a responsive
+**Angular 22** dashboard.
 
 The entire business core lives in a **standalone, pure-Java Maven library** with **zero framework
 dependencies**. The Spring Boot app depends on that library like any other JAR and implements the
-*adapters* (REST on the input side, MySQL on the output side).
+*adapters* (REST on the input side, MySQL on the output side). The Angular frontend talks to the
+REST API through a dev-server proxy.
 
 ---
 
@@ -72,6 +74,7 @@ hexagonal-orders/
         ├── java/com/example/hex/
         │   ├── HexagonalOrdersApplication.java   ← Spring Boot entry point
         │   ├── config/AppConfig.java             ← composition root (wires ports ⇄ adapters)
+        │   ├── config/WebConfig.java             ← CORS for the Angular dev server
         │   └── adapter/
         │       ├── in/rest/                      ← PRIMARY adapter: REST controller + DTOs
         │       │   ├── OrderController.java
@@ -80,7 +83,22 @@ hexagonal-orders/
         │           ├── OrderJpaEntity.java       (DB representation, separate from domain)
         │           ├── SpringDataOrderJpaRepository.java
         │           └── OrderRepositoryJpaAdapter.java  (implements OrderRepository port)
-        └── resources/application.properties      ← datasource config
+        └── resources/application.properties      ← datasource config (env vars)
+
+frontend/                           ← ANGULAR 22 DASHBOARD (the "primary primary" adapter)
+    ├── angular.json                 (proxies /api → localhost:8080 during `ng serve`)
+    ├── proxy.conf.json
+    └── src/
+        ├── styles.css               ← design system: themes, tokens, primitives
+        └── app/
+            ├── services/order.service.ts  (fetch-based, signals + computed state)
+            ├── services/toast.service.ts
+            ├── components/order-form/     ← create orders
+            ├── components/toast/          ← success/error notifications
+            └── components/order-card/     ← status badges + confirm/ship/cancel
+            & app.ts / app.html / app.css  ← shell: hero, stats, filters, grid
+
+docker-compose.yml                    ← local MySQL 8 (see Prerequisites)
 ```
 
 > The `core` module produces `hexagonal-orders-core-1.0.0.jar` — a plain, dependency-free JAR.
@@ -92,29 +110,43 @@ hexagonal-orders/
 
 | Layer | Technology |
 |---|---|
-| Language | Java 17 |
-| Build | Maven (multi-module) |
+| Backend language | Java 17 |
+| Backend build | Maven (multi-module) |
 | Framework (app only) | Spring Boot 3.2, Spring Web, Spring Data JPA |
 | Database | MySQL 8 (runtime) / H2 (tests) |
-| Testing | JUnit 5, AssertJ |
+| Backend testing | JUnit 5, AssertJ |
+| Frontend | Angular 22 (Standalone components, signals) |
+| Frontend styling | Hand-rolled design system (CSS custom properties, dark/light themes) |
 
 ---
 
 ## Prerequisites
 
-- **Java 17+**
-- **Maven 3.9+**
-- **MySQL 8** running on `localhost:3306` (see below), **or** Docker
+- **Java 17+** and **Maven 3.9+** (backend)
+- **Node.js 20+** and npm (frontend)
+- **Docker** (with the Compose plugin) — used to start MySQL 8
 
-### Quick MySQL with Docker
+### 1. Start MySQL with Docker Compose
+
+From the project root:
 
 ```bash
-docker run -d --name hex-mysql \
-  -e MYSQL_ROOT_PASSWORD=root \
-  -e MYSQL_DATABASE=hex_orders \
-  -p 3306:3306 \
-  mysql:8.0
+docker compose up -d
 ```
+
+This starts a `mysql:8.0` container (name `hex-mysql`) on `localhost:3306` and creates the
+`hex_orders` database. Data is persisted in a named Docker volume, so it survives restarts.
+
+To stop it:
+
+```bash
+docker compose down        # stops the container
+docker compose down -v     # stops AND wipes the data volume
+```
+
+> If you previously started MySQL with `docker run` a container named `hex-mysql` may be
+> occupying port 3306. Stop it first: `docker stop hex-mysql && docker rm hex-mysql`
+> (or run `docker compose up -d` after removing it).
 
 The app creates the database automatically if missing (`createDatabaseIfNotExist=true`).
 
@@ -131,7 +163,7 @@ mvn clean install
 This compiles the **core** (pure Java), runs its tests, installs the JAR to your local
 `~/.m2` repository, then builds the **app** against it.
 
-### 2. Start the app
+### 2. Start the app (Spring Boot REST API)
 
 ```bash
 cd app
@@ -144,17 +176,51 @@ Or run the packaged JAR:
 java -jar app/target/hexagonal-orders-app-1.0.0.jar
 ```
 
+### 3. Start the frontend (Angular)
+
+In a second terminal:
+
+```bash
+cd frontend
+npm install          # first time only
+ng serve
+```
+
+Open http://localhost:4200 — the dashboard loads. During `ng serve`, Angular proxies every
+`/api` call to the Spring Boot API on `localhost:8080` (see `frontend/proxy.conf.json`), so no
+CORS is involved in local development. The API is also reachable directly at
+http://localhost:8080/api/orders.
+
+> The API accepts cross-origin requests from `http://localhost:4200` too
+> (see `app/.../config/WebConfig.java`), so a separately-hosted build of `frontend/dist` can
+> talk to the API without a proxy.
+
 ---
 
 ## Database Configuration
 
-Edit `app/src/main/resources/application.properties` to match your environment:
+The datasource is configured with **environment variables** that have local-friendly fallbacks,
+so it works out of the box with the compose defaults:
 
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/hex_orders?createDatabaseIfNotExist=true
-spring.datasource.username=root
-spring.datasource.password=root
+spring.datasource.url=jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:hex_orders}?createDatabaseIfNotExist=true
+spring.datasource.username=${MYSQL_USER:root}
+spring.datasource.password=${MYSQL_PASSWORD:root}
 spring.jpa.hibernate.ddl-auto=update
+```
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `MYSQL_HOST` | `localhost` | Database host |
+| `MYSQL_PORT` | `3306` | Database port |
+| `MYSQL_DATABASE` | `hex_orders` | Database/schema name |
+| `MYSQL_USER` | `root` | DB user |
+| `MYSQL_PASSWORD` | `root` | DB password (matches `MYSQL_ROOT_PASSWORD` in `docker-compose.yml`) |
+
+Override any of them when running the app, e.g.:
+
+```bash
+MYSQL_PASSWORD=mysecret mvn spring-boot:run
 ```
 
 ---
@@ -245,12 +311,28 @@ identical.
 
 ---
 
+## Frontend at a Glance
+
+The Angular dashboard is a *primary adapter* for the order API — a complete, self-contained UI
+that stays decoupled from the backend contract beyond the REST DTOs:
+
+- Glass-morphism cards and panels, gradient accents, and a **dark / light theme** (auto-detects
+  your OS preference, toggle is persisted).
+- Fully **responsive**: single-column on phones, form + orders grid on desktop.
+- Live stats (total orders, active value, pending, shipped) computed with **signals**.
+- Status filter chips with counts; contextual **Confirm / Ship / Cancel** actions per order
+  (buttons appear only when the business rules allow them).
+- Optimistic card animations, skeleton loading, toasts, and friendly empty / error states.
+
+---
+
 ## Try It Yourself
 
 - Swap the MySQL adapter: implement `OrderRepository` backed by files or an in-memory store and
   register it in `AppConfig` — the domain never notices.
 - Add a *second* primary adapter (e.g. a CLI) that calls `OrderService` without HTTP.
 - Add a domain event (e.g. `OrderShippedEvent`) published from `OrderServiceImpl`.
+- Add a frontend "Deliver" action for shipped orders once the API supports it.
 
 ---
 

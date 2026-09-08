@@ -26,5 +26,11 @@ buildNumber.properties
 # Logs
 *.log
 
+# Angular / Node
+node_modules/
+frontend/dist/
+.angular/
+*.tsbuildinfo
+
 # Local config (never commit real credentials)
 *.env

@@ -1,0 +1,88 @@
+.card {
+  padding: 1.2rem 1.3rem;
+  border-radius: 20px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.22s ease, background 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  animation: card-in 0.35s ease both;
+  animation-delay: var(--delay, 0ms);
+}
+
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  background: var(--surface-hover);
+}
+
+.card__top { display: flex; align-items: center; gap: 0.8rem; }
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  box-shadow: var(--shadow-md);
+  flex: none;
+}
+
+.card__meta { flex: 1; min-width: 0; }
+
+.card__id {
+  font-family: 'SF Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  letter-spacing: 0.04em;
+}
+
+.card__name {
+  font-size: 1.08rem;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card__line { margin: 0; color: var(--text-muted); font-size: 0.85rem; }
+
+.card__total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0.7rem 0;
+  border-top: 1px dashed var(--border);
+  border-bottom: 1px dashed var(--border);
+}
+.card__total-label { font-size: 0.72rem; font-weight: 600; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.05em; }
+.card__total-value { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.12rem; }
+
+.card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  margin-top: auto;
+}
+
+.card__actions { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }
+
+.icon-btn { padding: 0.6rem; border-radius: 11px; }
+
+.card__time { font-size: 0.74rem; color: var(--text-faint); white-space: nowrap; }
+
+@media (max-width: 380px) {
+  .card__foot { flex-direction: column; align-items: stretch; }
+  .card__actions { justify-content: stretch; }
+  .card__actions .btn { flex: 1; }
+}
