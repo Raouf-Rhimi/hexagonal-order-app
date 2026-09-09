@@ -47,7 +47,7 @@ export class OrderService {
     this.error.set(null);
     try {
       const res = await fetch(API_BASE);
-      if (!res.ok) throw new Error(`Server responded ${res.status}`);
+      if (!res.ok) throw new Error(`Request failed (${res.status})`);
       this.orders.set((await res.json()) as Order[]);
     } catch (e) {
       this.error.set(e instanceof Error ? e.message : 'Could not reach the server');
@@ -89,7 +89,7 @@ export class OrderService {
 
   private async handle(res: Response): Promise<Order> {
     if (!res.ok) {
-      let message = `Server responded ${res.status}`;
+      let message = `Request failed (${res.status}). Please try again.`;
       try {
         const text = await res.text();
         if (text && text.trim().length > 0) message = text.trim();

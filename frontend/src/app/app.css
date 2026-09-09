@@ -199,17 +199,6 @@
 .footer-inner { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
 .footer__brand { font-family: 'Sora', sans-serif; font-weight: 800; }
 .footer__text { color: var(--text-faint); font-size: 0.85rem; margin-inline: auto; }
-.footer__link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  text-decoration: none;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 600;
-  transition: color 0.15s ease;
-}
-.footer__link:hover { color: var(--primary); }
 
 /* ── Responsive ── */
 @media (max-width: 920px) {

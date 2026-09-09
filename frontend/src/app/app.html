@@ -3,19 +3,18 @@
 <!-- ───────────────── Header ───────────────── -->
 <header class="site-header">
   <div class="container header-inner">
-    <a class="brand" href="#" aria-label="Hexagonal Shop home">
+    <a class="brand" href="#" aria-label="Orderly home">
       <span class="brand__logo" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-          <path d="M12 2.5 21 7v10l-9 4.5L3 17V7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-          <path d="M3 7l9 4.5L21 7M12 11.5V21.5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
+          <path d="M6 8h12l-1.2 12.2a1.8 1.8 0 0 1-1.8 1.6H9a1.8 1.8 0 0 1-1.8-1.6L6 8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M9 10V6.5a3 3 0 0 1 6 0V10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
         </svg>
       </span>
-      <span class="brand__text">Hex&shy;Shop</span>
+      <span class="brand__text">Orderly</span>
     </a>
 
     <nav class="nav-links" aria-label="Primary">
       <a href="#orders" class="nav-link">Orders</a>
-      <a href="https://github.com/Raouf-Rhimi/Order-App" target="_blank" rel="noopener" class="nav-link">Source</a>
     </nav>
 
     <button class="theme-toggle" (click)="toggleTheme()" [attr.aria-label]="theme() === 'light' ? 'Switch to dark mode' : 'Switch to light mode'">
@@ -32,11 +31,11 @@
 <main class="container">
   <section class="hero">
     <div class="hero__copy">
-      <span class="eyebrow">Hexagonal architecture · REST API</span>
+      <span class="eyebrow">Order management platform</span>
       <h1 class="heading">Orders,<br />beautifully managed.</h1>
       <p class="subheading">
-        A pure-Java business core powering a Spring Boot API and this responsive dashboard.
-        Dark &amp; light themes, live updates, and a status flow you can click through.
+        Manage your storefront orders from purchase to shipment — dark &amp; light themes,
+        live updates, and a status flow you can control in one click.
       </p>
 
       <div class="stats" role="list">
@@ -105,7 +104,7 @@
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </span>
         <h3 class="state__title">No connection</h3>
-        <p class="state__text">The order API at <code>/api/orders</code> isn't reachable. Start the Spring Boot app, then retry.</p>
+        <p class="state__text">We couldn't reach the orders service. Make sure it's running, then try again.</p>
         <button class="btn btn-primary" (click)="retry()">Retry</button>
       </div>
     }
@@ -142,13 +141,9 @@
 <!-- ───────────────── Footer ───────────────── -->
 <footer class="site-footer">
   <div class="container footer-inner">
-    <span class="footer__brand">Hex&shy;Shop</span>
+    <span class="footer__brand">Orderly</span>
     <span class="footer__text">
-      Pure-Java core · Spring Boot adapters · Angular dashboard
+      Order management, made simple.
     </span>
-    <a class="footer__link" href="https://github.com/Raouf-Rhimi/Order-App" target="_blank" rel="noopener">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.9c.58.11.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.26-1.28-5.26-5.7 0-1.26.45-2.29 1.2-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.24 2.76.12 3.05.75.81 1.2 1.84 1.2 3.1 0 4.43-2.7 5.4-5.28 5.69.42.36.79 1.08.79 2.18v3.23c0 .31.21.68.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/></svg>
-      GitHub
-    </a>
   </div>
 </footer>

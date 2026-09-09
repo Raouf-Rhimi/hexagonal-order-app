@@ -49,7 +49,7 @@ export class App implements OnInit {
   ngOnInit() {
     this.orders
       .load()
-      .catch(() => this.toast.error('Could not reach the order API'));
+      .catch(() => this.toast.error('Could not reach the orders service'));
   }
 
   protected readonly filters: readonly Filter[] = ['ALL', 'PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
